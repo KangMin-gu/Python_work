@@ -5,8 +5,8 @@ import mysql.connector
 #DB 접속 정보를 dict type 으로 준비한다.
 config={
         'user':'root', #계정
-        'password':'maria', #비밀번호
-        'host':'127.0.0.1', #여기가 ip주소 
+        'password':'maria2', #비밀번호
+        'host':'127.0.0.1', #여기가 ip주소
         'database':'mingu',
         'port':3306 # 포트번호는 3306 오라클일경우는 1521이였다.
     }
@@ -15,19 +15,21 @@ if __name__ == '__main__':
     
     try:
         #Maria DB 연결 객체 
-        conn = mysql.connector.connect(**config) #dict type 을 풀어서 전달. 
+        conn = mysql.connector.connect(**config) #dict type 을 풀어서 전달.  
+        # dictdml ** 는 메소드호출할때 dict에 있는거를 keyword argument로 바꿔서 전달한다. (ex] user='root',password='maria'...)
         #dict로안하면 (user='root', password='maria'.....) 전부 써줘야한다. 
-        
+       
+        #qury 문을 수행해줄 객체 
         cursor=conn.cursor() #java(oracle) 로 따지면 Preparedstatement
-        #실행할 query 문
+       
+        #실행할 query 문 유니코드(한글)처리할려면 앞에u를 붙이면된다. 
         sql="""
         select num,name,addr 
         from member 
-        ORDER By num ASC
-        
+        ORDER By num desc
         """
         #여러줄의 쿼리문을 쓸때는 """xx""" or '''xx''' 사이에 작성한다. 한줄쓸때는 "" 이안에 쓴다.  주석으로 인식안하고 문자열로 인식해준다.
-        #조건절은 oracle ? 이지만 python은 $s로 쓴다
+        #조건절은 oracle '?' 이지만 python은 '$s'로 쓴다
         # query 문 수행
         cursor.execute(sql)
         # result 는 tuple 이 순서대로 들어 있는 list 이다. 
@@ -45,8 +47,20 @@ if __name__ == '__main__':
     except Exception, e:
         print e 
     finally:
-        conn.close()
+        try:
+            conn.close()
+        except NameError:
+            pass
         
+        '''
+        
+python finally = java finally
+
+            try{
+                conn.close()
+              }catch(Exception e){}  
+        '''
+       
     print "메인 메소드가 종료 됩니다."
         
         
